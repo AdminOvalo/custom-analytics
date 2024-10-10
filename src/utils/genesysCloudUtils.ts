@@ -18,11 +18,9 @@ export function getCurrentUserData() {
     let opts = {};
   
     usersApi.getUsersMe(opts)
-      .then((data) => {
-        let name = data.name;
-        view.displayUserData(name)
-      })
-  }
+      .then((data: Models.UserMe) => data.name)
+      .catch((error) => console.log(error))
+}
   
 export function formatDate() {
     let formattedDate = interval;
@@ -31,7 +29,8 @@ export function formatDate() {
     formattedDate = formattedDate.replace("/", " to ");
     let formattedFrom = formattedDate.slice(0,10);
     let formattedTo = formattedDate.slice(26,37);
-    view.viewDate(formattedFrom,formattedTo)
+    // view.viewDate(formattedFrom,formattedTo)
+    return "Data from " + formattedFrom + " to " + formattedTo
 }
   
 // Change the date to the user's desired date.
@@ -62,9 +61,9 @@ export function getNumberofCalls() {
     }; // Object | query
   
     analyticsApi.postAnalyticsConversationsDetailsQuery(body)
-      .then((data) => {
-        view.displayNumberofCalls(data.totalHits)
-      
+      .then((data: Models.AnalyticsConversationQueryResponse) => {
+        // view.displayNumberofCalls(data.totalHits)
+        return data.totalHits
     })
 }
   
@@ -89,9 +88,9 @@ export  function getChatInteractions() {
     }; // Object | query
   
     analyticsApi.postAnalyticsConversationsDetailsQuery(body)
-      .then((data) => {
-        view.displayNumberofChat(data.totalHits) 
-  
+      .then((data: Models.AnalyticsConversationQueryResponse) => {
+        // view.displayNumberofChat(data.totalHits) 
+        return data.totalHits
     })
 }
   
@@ -126,8 +125,9 @@ export function abandonedCalls() {
     }; // Object | query
   
     analyticsApi.postAnalyticsConversationsDetailsQuery(body)
-      .then((data) => {
-        view.displayNumberofAbandoned(data.totalHits) 
+      .then((data: Models.AnalyticsConversationQueryResponse) => {
+        // view.displayNumberofAbandoned(data.totalHits) 
+        return data.totalHits
     })
 }
   
@@ -162,8 +162,9 @@ export function getNumberofAnsweredCall() {
     }; // Object | query
   
     analyticsApi.postAnalyticsConversationsDetailsQuery(body)
-      .then((data) => {
-        view.displayNumberofAnswered(data.totalHits) 
+      .then((data:Models.AnalyticsConversationQueryResponse) => {
+        // view.displayNumberofAnswered(data.totalHits) 
+        return data.totalHits
     })
 }
   
@@ -194,8 +195,9 @@ export function getNumberofVoiceOutbound() {
     }; // Object | query
   
     analyticsApi.postAnalyticsConversationsDetailsQuery(body)
-      .then((data) => {
-        view.displayNumberofVoiceOutbound(data.totalHits);
+      .then((data:  Models.AnalyticsConversationQueryResponse) => {
+        // view.displayNumberofVoiceOutbound(data.totalHits);
+        return data.totalHits
     })
 }
   
@@ -226,8 +228,9 @@ export function getNumberofVoiceInbound() {
     }; // Object | query
   
     analyticsApi.postAnalyticsConversationsDetailsQuery(body)
-      .then((data) => {
-        view.displayNumberofVoiceInbound(data.totalHits);
+      .then((data:  Models.AnalyticsConversationQueryResponse) => {
+        // view.displayNumberofVoiceInbound(data.totalHits);
+        return data.totalHits
     })
 }
   
@@ -238,8 +241,9 @@ export function populateUsers() {
     }; // Object | Search request options
   
     usersApi.postUsersSearch(body)
-      .then((data) => {
-        view.displayNumberofUsers(data);
+      .then((data:  Models.UsersSearchResponse) => {
+        // view.displayNumberofUsers(data);
+        return data
     })
 }
   
@@ -284,13 +288,16 @@ export function generateUserData(selectedUserId:string) {
      */
   
     analyticsApi.postAnalyticsUsersDetailsQuery(body)
-      .then((data:any) => {
+      .then((data:Models.AnalyticsUserDetailsQueryResponse) => {
         if (data.hasOwnProperty('userDetails')) {
+          let dataList: any[] = []
           for (const results of data.userDetails[0].primaryPresence) {
-            view.populateUsertable(results)
+            // view.populateUsertable(results)
+            dataList.push(results)
           }
         } else {
-          view.populateUsertable([])
+          // view.populateUsertable([])
+          return []
         }
     })
 }
