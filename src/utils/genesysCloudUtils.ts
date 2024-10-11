@@ -13,13 +13,20 @@ let interval : string;
 
 // handle view error
 
+export function initAll() {
+  return client.loginImplicitGrant(configuration.clientID, configuration.redirectUri)
+    .then((data:any) => {
+      return data
+    })
+    .catch((error: any) => console.log(error))
+}
 
 export function getCurrentUserData() {
     let opts = {};
   
-    usersApi.getUsersMe(opts)
+    return usersApi.getUsersMe(opts)
       .then((data: Models.UserMe) => data.name)
-      .catch((error) => console.log(error))
+      // .catch((error) => console.log(error))
 }
   
 export function formatDate() {
@@ -235,18 +242,18 @@ export function getNumberofVoiceInbound() {
 }
   
 export function populateUsers() {
-    let body = {
-      "sortOrder": "ASC",
-      "pageSize": 100
-    }; // Object | Search request options
-  
-    usersApi.postUsersSearch(body)
-      .then((data:  Models.UsersSearchResponse) => {
-        // view.displayNumberofUsers(data);
-        return data
-    })
+  let body = {
+    "sortOrder": "ASC",
+    "pageSize": 100
+  }; // Object | Search request options
+
+  return usersApi.postUsersSearch(body)
+    .then((data:  Models.UsersSearchResponse) => {
+      // view.displayNumberofUsers(data);
+      return data
+  })
 }
-  
+
 export function generateUserData(selectedUserId:string) {
     let body = {
       interval: interval,
@@ -289,15 +296,17 @@ export function generateUserData(selectedUserId:string) {
   
     analyticsApi.postAnalyticsUsersDetailsQuery(body)
       .then((data:Models.AnalyticsUserDetailsQueryResponse) => {
-        if (data.hasOwnProperty('userDetails')) {
-          let dataList: any[] = []
-          for (const results of data.userDetails[0].primaryPresence) {
-            // view.populateUsertable(results)
-            dataList.push(results)
+        if (data.userDetails && data.userDetails.length >= 0) {
+          let dataList: Models.AnalyticsUserPresenceRecord[] = []
+          if (data.userDetails[0].primaryPresence) {
+            for (const results of data.userDetails[0].primaryPresence) {
+              dataList.push(results)
+              // view.populateUsertable(results)
+            }
           }
         } else {
-          // view.populateUsertable([])
           return []
+          // view.populateUsertable([])
         }
     })
 }

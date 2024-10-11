@@ -1,6 +1,31 @@
 import './App.css'
+import { getCurrentUserData, initAll, populateUsers } from "../src/utils/genesysCloudUtils"
+import { useMemo, useState } from 'react'
+import { Models } from 'purecloud-platform-client-v2'
 
 function App() {
+  const [userAuth, setUserAuth] = useState<string| undefined>(undefined)
+  const [users, setUsers] = useState<Models.UsersSearchResponse|undefined>(undefined)
+
+  async function init() {
+    await initAll()
+      .then(() =>{
+        return getCurrentUserData()
+      })
+      .then((data:any) => { setUserAuth(data);})
+      .catch((error: any) => console.log(error))
+  }
+  async function populateAuthUsers () {
+      await populateUsers()
+      .then((data:Models.UsersSearchResponse) => data)
+      .then((Usersdatas: Models.UsersSearchResponse) => setUsers(Usersdatas))
+      .catch((error: any) => console.log(error))
+  }
+
+  useMemo(() => {
+    init()
+    populateAuthUsers()
+  }, [userAuth])
 
   return (
     <>
@@ -9,11 +34,12 @@ function App() {
         <span className="w3-bar-item w3-right w3-text-white" id="date">Data from  </span>
       </div>
 
-      {/* Sidebar/menu */}
+      <div>
+        {/* Sidebar/menu */}
       <nav className="w3-sidebar w3-collapse ">
         <div className="w3-container w3-row">
           <div className="w3-col s8 w3-bar">
-            <span>Welcome, <strong id="userName"></strong></span><br/>
+            <span>Welcome, {userAuth}</span><br/>
           </div>
         </div>
         <hr/>
@@ -83,7 +109,7 @@ function App() {
         <div className="w3-row-padding">
           <div className="w3-twothird">
             <h5>Activities</h5>
-            <table className="w3-table w3-striped w3-white">
+            {/* <table className="w3-table w3-striped w3-white">
               <tr>
                 <td><i className="fa fa-user-circle w3-large fa-accent-charcoal"></i></td>
                 <td>Voice Inbound</td>
@@ -96,27 +122,31 @@ function App() {
               </tr>
               <tr>
               </tr>
-            </table>
+            </table> */}
           </div>
         </div>
       </div>
       <hr/>
 
       <div className="w3-container">
-        <h6>Select Agent</h6> <select id="agentsList"></select>
+        <h6>Select Agent</h6>
+        <select id="agentsList">
+          {users && users.results.map((user:Models.User, index:number) => {
+            return <option key={"user_"+index} value={user.id}>{user.name}</option>
+          })}
+        </select>
         <h5>Agent Details</h5>
 
-        <table className="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white" id="userTable">
+        {/* <table className="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white" id="userTable">
           <tr>
             <td> <b>Start Date and Time</b></td>
             <td><b>End Date and Time</b></td>
             <td><b>System Presence</b></td>
           </tr>
-        </table><br/>
+        </table><br/> */}
       </div>
       </div>
-
-      
+      </div>
     </>
     
   )
