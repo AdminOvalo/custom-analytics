@@ -25,7 +25,7 @@ function App() {
       .then(() =>{
         return getCurrentUserData()
       })
-      .then((data:any) => { setUserAuth(data);})
+      .then((data:any) => { setUserAuth(data)})
       .catch((error: any) => console.log(error))
   }
   async function populateAuthUsers () {
@@ -89,11 +89,6 @@ function App() {
     .catch((error: any) => console.log("getUserData => "+ error))
   }
   
-
-  
-
-    
-
   useEffect(() => {
     init()
     getUserData()
@@ -131,7 +126,7 @@ function App() {
         <div className="w3-main">
           {/* Header */}
           <header className="w3-container w3-padding-16">
-            <h5><b><i className="fa fa-dashboard"></i> Agents Dashboard</b></h5>
+            <h5><b><i className="fa fa-dashboard"></i>Agents Dashboard</b></h5>
           </header>
 
           <div className="w3-row-padding w3-margin-bottom w3-margin-top">
@@ -201,7 +196,7 @@ function App() {
             <hr/>
             <div className="w3-container">
               <h6>Select Agent</h6>
-              <select id="agentsList" value={selectedUserId} onChange={(e:any) => generateUsersDatas(e.target.value)}>
+              <select id="agentsList" defaultValue={selectedUserId} onChange={(e:any) => generateUsersDatas(e.target.value)}>
                 {users && users.results.map((user:Models.User, index:number) => {
                   return <option key={"user_"+index} value={user.id}>{user.name}</option>
                 })}
