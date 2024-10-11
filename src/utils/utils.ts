@@ -6,3 +6,9 @@ export function formatedDate(data: string | undefined) {
     text = text.slice(0, 19);
     return text
 }
+
+export function addDaysToDateTime(data: Date, days: number = 31) {
+    const [now] = [data];
+    const inNDays = new Date(new Date(now).setDate(now.getDate() + days))
+    return inNDays
+}

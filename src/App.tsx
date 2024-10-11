@@ -3,6 +3,7 @@ import { generateUserData, getCurrentUserData, initAll, populateUsers, getChatIn
 import { useEffect, useState } from 'react'
 import { Models } from 'purecloud-platform-client-v2'
 import { formatedDate } from './utils/utils'
+import CustomDateTimePicker from './components/CustomDateTimePicker'
 
 interface userData {
   chatNumber?: number,
@@ -99,7 +100,11 @@ function App() {
     <>
       {/* Top container */}
       <div className="w3-bar w3-top w3-large">
-        <span className="w3-bar-item w3-right w3-text-white" id="date">Data from {formatedDate(getDate().split("/")[0]) +" to "+ formatedDate(getDate().split("/")[1])} </span>
+        {/* <span className="w3-bar-item w3-right w3-text-white" id="date">Data from {formatedDate(getDate().split("/")[0]) +" to "+ formatedDate(getDate().split("/")[1])} </span> */}
+        <div className='w3-right'>
+          <span className="w3-bar-item  w3-text-white" id="date">Data from</span>
+          <CustomDateTimePicker />
+        </div>
       </div>
 
       <div>

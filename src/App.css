@@ -219,7 +219,7 @@ hr {
 
   .w3-bar {
     width: 100%;
-    overflow: hidden
+    overflow: inherit
   }
 
 
