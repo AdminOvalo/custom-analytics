@@ -9,24 +9,21 @@ client.setEnvironment(configuration.genesysCloud.region);
 // API Instances
 let analyticsApi = new platformClient.AnalyticsApi();
 let usersApi = new platformClient.UsersApi();
-let interval : string;
+let interval : string = "2024-01-01T16:00:00.000Z/2024-01-31T10:00:00.000Z";
 
 // handle view error
 
 export function initAll() {
   return client.loginImplicitGrant(configuration.clientID, configuration.redirectUri)
-    .then((data:any) => {
-      return data
-    })
+    .then((data:any) => data)
     .catch((error: any) => console.log(error))
 }
 
 export function getCurrentUserData() {
     let opts = {};
-  
     return usersApi.getUsersMe(opts)
-      .then((data: Models.UserMe) => data.name)
-      // .catch((error) => console.log(error))
+      .then((data: Models.UserMe) => data)
+      .catch((error) => console.log(error))
 }
   
 export function formatDate() {
@@ -43,7 +40,7 @@ export function formatDate() {
 // Change the date to the user's desired date.
 export function getDate() {
     // Ce interval de temps ne doit excédé 31 jours.
-    interval = "2024-01-01T16:00:00.000Z/2024-01-31T10:00:00.000Z"
+    return "2024-01-01T16:00:00.000Z/2024-01-31T10:00:00.000Z"
 
 }
   
@@ -256,7 +253,7 @@ export function populateUsers() {
 
 export function generateUserData(selectedUserId:string) {
     let body = {
-      interval: interval,
+      interval: getDate(),
       order: "asc",
       paging: {
         pageSize: 25,
@@ -294,7 +291,7 @@ export function generateUserData(selectedUserId:string) {
         { "totalHits": 0 }
      */
   
-    analyticsApi.postAnalyticsUsersDetailsQuery(body)
+    return analyticsApi.postAnalyticsUsersDetailsQuery(body)
       .then((data:Models.AnalyticsUserDetailsQueryResponse) => {
         if (data.userDetails && data.userDetails.length >= 0) {
           let dataList: Models.AnalyticsUserPresenceRecord[] = []
@@ -303,6 +300,7 @@ export function generateUserData(selectedUserId:string) {
               dataList.push(results)
               // view.populateUsertable(results)
             }
+            return dataList
           }
         } else {
           return []
