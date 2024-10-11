@@ -64,7 +64,7 @@ export function getNumberofCalls() {
       }]
     }; // Object | query
   
-    analyticsApi.postAnalyticsConversationsDetailsQuery(body)
+    return analyticsApi.postAnalyticsConversationsDetailsQuery(body)
       .then((data: Models.AnalyticsConversationQueryResponse) => {
         // view.displayNumberofCalls(data.totalHits)
         return data.totalHits
@@ -73,7 +73,7 @@ export function getNumberofCalls() {
   
 export  function getChatInteractions() {
     let body: any = {
-      interval: interval,
+      interval: getDate(),
       order: "asc",
       orderBy: "conversationStart",
       paging: {
@@ -91,7 +91,7 @@ export  function getChatInteractions() {
       }]
     }; // Object | query
   
-    analyticsApi.postAnalyticsConversationsDetailsQuery(body)
+    return analyticsApi.postAnalyticsConversationsDetailsQuery(body)
       .then((data: Models.AnalyticsConversationQueryResponse) => {
         // view.displayNumberofChat(data.totalHits) 
         return data.totalHits
@@ -128,7 +128,7 @@ export function abandonedCalls() {
       }]
     }; // Object | query
   
-    analyticsApi.postAnalyticsConversationsDetailsQuery(body)
+    return analyticsApi.postAnalyticsConversationsDetailsQuery(body)
       .then((data: Models.AnalyticsConversationQueryResponse) => {
         // view.displayNumberofAbandoned(data.totalHits) 
         return data.totalHits
@@ -165,7 +165,7 @@ export function getNumberofAnsweredCall() {
       }]
     }; // Object | query
   
-    analyticsApi.postAnalyticsConversationsDetailsQuery(body)
+    return analyticsApi.postAnalyticsConversationsDetailsQuery(body)
       .then((data:Models.AnalyticsConversationQueryResponse) => {
         // view.displayNumberofAnswered(data.totalHits) 
         return data.totalHits
@@ -198,7 +198,7 @@ export function getNumberofVoiceOutbound() {
       }]
     }; // Object | query
   
-    analyticsApi.postAnalyticsConversationsDetailsQuery(body)
+    return analyticsApi.postAnalyticsConversationsDetailsQuery(body)
       .then((data:  Models.AnalyticsConversationQueryResponse) => {
         // view.displayNumberofVoiceOutbound(data.totalHits);
         return data.totalHits
@@ -231,7 +231,7 @@ export function getNumberofVoiceInbound() {
       }]
     }; // Object | query
   
-    analyticsApi.postAnalyticsConversationsDetailsQuery(body)
+    return analyticsApi.postAnalyticsConversationsDetailsQuery(body)
       .then((data:  Models.AnalyticsConversationQueryResponse) => {
         // view.displayNumberofVoiceInbound(data.totalHits);
         return data.totalHits
