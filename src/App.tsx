@@ -1,8 +1,8 @@
 import './App.css'
-import { generateUserData, getCurrentUserData, initAll, populateUsers, getChatInteractions, abandonedCalls, getNumberofAnsweredCall, getNumberofVoiceOutbound, getNumberofVoiceInbound, getNumberofCalls, getDate } from "../src/utils/genesysCloudUtils"
+import { generateUserData, getCurrentUserData, initAll, populateUsers, getChatInteractions, abandonedCalls, getNumberofAnsweredCall, getNumberofVoiceOutbound, getNumberofVoiceInbound, getNumberofCalls, formatInterval } from "../src/utils/genesysCloudUtils"
 import { useEffect, useState } from 'react'
 import { Models } from 'purecloud-platform-client-v2'
-import { formatedDate } from './utils/utils'
+import { formatedDate, minusDaysToDateTime } from './utils/utils'
 import CustomDateTimePicker from './components/CustomDateTimePicker'
 
 interface userData {
@@ -15,6 +15,7 @@ interface userData {
 }
 
 function App() {
+  const [interval, setInterval] = useState<string>(formatInterval(minusDaysToDateTime(new Date())))
   const [userAuth, setUserAuth] = useState<Models.UserMe| undefined>(undefined)
   const [userAuthData, setUserAuthData] = useState< userData|undefined>()
   const [users, setUsers] = useState<Models.UsersSearchResponse|undefined>(undefined)
@@ -29,58 +30,59 @@ function App() {
       .then((data:any) => { setUserAuth(data)})
       .catch((error: any) => console.log(error))
   }
-  async function populateAuthUsers () {
+  async function populateAuthUsers(dataInter:string) {
     await populateUsers()
     .then((data:Models.UsersSearchResponse) => data)
     .then((usersdatas: Models.UsersSearchResponse) => {
       setUsers(usersdatas)
       if (usersdatas) {
         setSelectedUserId(usersdatas.results[0].id)
-        if (usersdatas.results[0].id) generateUsersDatas(usersdatas.results[0].id)
+        if (usersdatas.results[0].id) generateUsersDatas(usersdatas.results[0].id, dataInter)
       }
     })
     .catch((error: any) => console.log(error))
   }
-  async function generateUsersDatas(id: string) {
-    await generateUserData(id)
+
+  async function generateUsersDatas(id: string, dataInter:string) {
+    await generateUserData(id, dataInter)
     .then((data: Models.AnalyticsUserPresenceRecord[] | undefined) => data ?? [])
     .then((usersdatas:  Models.AnalyticsUserPresenceRecord[]) => {
       setUsersDatas(usersdatas)
     })
     .catch((error: any) => console.log(error))
   }
-  async function getUserData() {
-    await getChatInteractions()
+  async function getUserData(dataInter:string) {
+    await getChatInteractions(dataInter)
     .then((data:number| undefined) => data ?? 0)
     .then(async (data: number) => {
       setUserAuthData((prev:userData | undefined) => {
         return {...prev, chatNumber: data}
       })
-      return await abandonedCalls()
+      return await abandonedCalls(dataInter)
     }).then((data:number| undefined) => data ?? 0)
     .then(async (data: number) => {
       setUserAuthData((prev:userData | undefined) => {
         return {...prev, callAbondonedNumber: data}
       })
-      return await getNumberofAnsweredCall();
+      return await getNumberofAnsweredCall(dataInter);
     }).then((data:number| undefined) => data ?? 0)
     .then(async (data: number) => {
       setUserAuthData((prev:userData | undefined) => {
         return {...prev, callAnswerNumber: data}
       })
-      return await getNumberofVoiceOutbound()
+      return await getNumberofVoiceOutbound(dataInter)
     }).then((data:number| undefined) => data ?? 0)
     .then(async (data: number) => {
       setUserAuthData((prev:userData | undefined) => {
         return {...prev, callOutofBound: data}
       })
-      return await getNumberofVoiceInbound()
+      return await getNumberofVoiceInbound(dataInter)
     }).then((data:number| undefined) => data ?? 0)
     .then(async (data: number) => {
       setUserAuthData((prev:userData | undefined) => {
         return {...prev, callInBound: data}
       })
-      return await getNumberofCalls()
+      return await getNumberofCalls(dataInter)
     }).then((data:number| undefined) => data ?? 0)
     .then((data: number) => {
       setUserAuthData((prev:userData | undefined) => {
@@ -89,21 +91,23 @@ function App() {
     })
     .catch((error: any) => console.log("getUserData => "+ error))
   }
+
+  useEffect(() => {
+      getUserData(interval)
+      populateAuthUsers(interval)
+  }, [interval])
   
   useEffect(() => {
     init()
-    getUserData()
-    populateAuthUsers()
   }, [])
 
   return (
     <>
       {/* Top container */}
       <div className="w3-bar w3-top w3-large">
-        {/* <span className="w3-bar-item w3-right w3-text-white" id="date">Data from {formatedDate(getDate().split("/")[0]) +" to "+ formatedDate(getDate().split("/")[1])} </span> */}
         <div className='w3-right'>
           <span className="w3-bar-item  w3-text-white" id="date">Data from</span>
-          <CustomDateTimePicker />
+          <CustomDateTimePicker selected={minusDaysToDateTime(new Date())} setData={(value:string) => setInterval(value)}/>
         </div>
       </div>
 
@@ -201,7 +205,7 @@ function App() {
             <hr/>
             <div className="w3-container">
               <h6>Select Agent</h6>
-              <select id="agentsList" defaultValue={selectedUserId} onChange={(e:any) => generateUsersDatas(e.target.value)}>
+              <select id="agentsList" defaultValue={selectedUserId} onChange={(e:any) => generateUsersDatas(e.target.value, interval)}>
                 {users && users.results.map((user:Models.User, index:number) => {
                   return <option key={"user_"+index} value={user.id}>{user.name}</option>
                 })}

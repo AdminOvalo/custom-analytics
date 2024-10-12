@@ -12,3 +12,9 @@ export function addDaysToDateTime(data: Date, days: number = 31) {
     const inNDays = new Date(new Date(now).setDate(now.getDate() + days))
     return inNDays
 }
+
+export function minusDaysToDateTime(data: Date, days: number = 31) {
+    const [now] = [data];
+    const inNDays = new Date(new Date(now).setDate(now.getDate() - days))
+    return inNDays
+}
